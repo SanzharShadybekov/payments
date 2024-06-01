@@ -33,4 +33,5 @@ class CustomUser(AbstractUser):
         self.activation_code = str(uuid4())
 
     def create_password_reset_code(self):
-        self.password_reset_code = str(uuid4())
+        from random import randint
+        self.password_reset_code = str(randint(100000, 999999))
