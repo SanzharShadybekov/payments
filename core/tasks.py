@@ -1,6 +1,9 @@
+from random import choices
+
 from django.core.mail import send_mail
 
 from accounts.send_mail import send_confirmation_email
+from services.models import Payment
 from .celery import app
 
 
@@ -18,3 +21,11 @@ def send_password_reset_email(email, code):
         [email],
         fail_silently=False,
     )
+
+
+@app.task
+def check_payment_status():
+    payments = Payment.objects.filter(status='pending')
+    for payment in payments:
+        payment.status = choices(['completed', 'failed'], weights=[8, 2])[0]
+        payment.save()
