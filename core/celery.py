@@ -1,6 +1,6 @@
 import os
 from celery import Celery
-from celery.schedules import crontab, schedule
+from celery.schedules import schedule
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 

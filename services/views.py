@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, permissions, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -11,6 +12,8 @@ User = get_user_model()
 class PaymentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Payment.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('amount', 'created_at', 'status')
 
     def get_permissions(self):
         if self.action in ('list', 'retrieve'):
