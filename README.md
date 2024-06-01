@@ -40,6 +40,7 @@ EMAIL_PASSWORD=
 ```
 python manage.py migrate
 ```
+
 ### Запуск Celery
 Убедитесь, что Redis сервер установлен и работает:
 ```
@@ -54,11 +55,54 @@ celery -A core beat
 ```
 python manage.py runserver
 ```
+
+### Так же можно запустить через докер контейнеры 
+* **Установка docker in ubuntu 20/22 instance** 
+```
+sudo apt update && sudo apt upgrade -y
+sudo apt install ca-certificates curl gnupg lsb-release unzip
+```
+Добавление Docker’s GPG key
+```
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
+Добавление official docker repo
+```
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+```
+Установка docker
+```
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+Добавление user to docker group
+```
+sudo usermod -aG docker $USER
+id $USER
+newgrp docker
+```
+Установка docker-compose
+```
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+Проверка docker and docker-compose
+```
+docker run hello-world
+docker-compose --version
+```
+* ### Запуск docker containers
+```
+docker-compose up --build -d
+```
+
 ## Ветвление в GIT
 - **main**: Ветка для продакшн.
-- **dev**: Ветка для тестирования.
+
 ## Рекомендации для разработчиков
 - Следовать стандарту PEP8.
 - Использовать `flake8` в качестве линтера.
 - Комментарии к коду должны быть на русском языке и написаны грамотно, с соблюдением правил пунктуации.
 - Все TODO-комментарии должны быть четко формулированы.
+- В файле Документация API Online Payments.docx описана документация для внедрения и интеграции сервсиса
