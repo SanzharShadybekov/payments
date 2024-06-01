@@ -5,7 +5,7 @@ from accounts.views import UserViewSet, PasswordResetViewSet
 
 router = SimpleRouter()
 router.register('', UserViewSet)
-router.register('password', PasswordResetViewSet)
+router.register('password', PasswordResetViewSet, 'password-reset')
 
 urlpatterns = [
     path('login/', views.LoginView.as_view()),
