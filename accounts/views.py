@@ -16,6 +16,13 @@ class UserViewSet(ListModelMixin, GenericViewSet):
     serializer_class = serializers.UserSerializer
     permission_classes = (AllowAny,)
 
+    def get_serializer_class(self):
+        if self.action == 'register':
+            return serializers.RegisterSerializer
+        if self.action == 'activate':
+            return None
+        return serializers.UserSerializer
+
     @action(['POST'], detail=False)
     def register(self, request, *args, **kwargs):
         serializer = serializers.RegisterSerializer(data=request.data)
