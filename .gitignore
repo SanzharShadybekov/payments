@@ -1,0 +1,34 @@
+.idea
+.env
+venv
+env
+
+media
+static
+
+db.sqlite3
+
+### celery-beat ###
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+### Django ###
+*.log
+*.pot
+*.pyc
+local_settings.py
+logs
