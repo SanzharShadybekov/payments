@@ -6,7 +6,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from accounts import serializers
-from core.tasks import send_confirmation_email_task
+from core.tasks import send_confirmation_email_task, send_password_reset_email
 
 User = get_user_model()
 
@@ -56,3 +56,46 @@ class LoginView(TokenObtainPairView):
 
 class RefreshView(TokenRefreshView):
     permission_classes = (AllowAny,)
+
+
+class PasswordResetViewSet(GenericViewSet):
+    permission_classes = (AllowAny,)
+
+    def get_serializer_class(self):
+        if self.action == 'request_reset':
+            return serializers.PasswordResetRequestSerializer
+        elif self.action == 'check_reset':
+            return serializers.PasswordResetCheckSerializer
+        return serializers.PasswordResetSerializer
+
+    @action(['POST'], detail=False)
+    def request_reset(self, request):
+        serializer = serializers.PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        user = User.objects.get(email=email)
+        user.create_password_reset_code()
+        user.save()
+        send_password_reset_email.delay(user.email, user.password_reset_code)
+        return Response({'msg': 'Password reset email sent.'}, status=200)
+
+    @action(['POST'], detail=False)
+    def check_reset(self, request):
+        serializer = serializers.PasswordResetCheckSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = serializer.validated_data['code']
+        user = User.objects.get(password_reset_code=code)
+        user.password_reset_code = ''
+        user.save()
+        return Response({'msg': 'reset code is checked.'}, status=200)
+
+    @action(['POST'], detail=False)
+    def reset(self, request):
+        serializer = serializers.PasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        new_password = serializer.validated_data['password']
+        user = User.objects.get(email=email)
+        user.set_password(new_password)
+        user.save()
+        return Response({'msg': 'Password has been reset.'}, status=200)

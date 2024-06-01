@@ -1,6 +1,6 @@
 from django.core.mail import send_mail
 
-HOST = 'localhost:8000'
+HOST = 'http://34.68.140.212/'
 
 
 def send_confirmation_email(user, code):

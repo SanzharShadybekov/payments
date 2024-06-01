@@ -33,3 +33,36 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('User with this email does not exist.')
+        return value
+
+
+class PasswordResetCheckSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+    def validate_code(self, value):
+        if not User.objects.filter(password_reset_code=value).exists():
+            raise serializers.ValidationError('Invalid code.')
+        return value
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(min_length=8)
+    password2 = serializers.CharField(min_length=8)
+
+    def validate(self, attrs):
+        password = attrs['password']
+        password2 = attrs.pop('password2')
+        if password2 != password:
+            raise serializers.ValidationError('Passwords didn\'t match!')
+        validate_password(password)
+        return attrs
